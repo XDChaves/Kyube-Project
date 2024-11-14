@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/logos/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/logos/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/logos/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/logos/android-chrome-512x512.png">
+
+    <title>Kyube</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <script src="/static/script.js" defer></script>
+    <script src="/static/formu.js" defer></script>
+    
+</head>
+
+<body>
+    <header class="header">
+        <nav>
+            <a class="foto">
+                <img src="/static/imagem/logopng.png">
+            </a>
+
+            <div class="navbar">
+                <a href="{{ url_for('index') }}">HOME</a>
+                <a href="{{ url_for('create') }}">CREATE</a>
+                <a href="{{ url_for('perfil') }}">PROFILE</a>
+
+            </div>
+
+            {% if 'user_id' in session %}
+                <div class="bloco2">
+                    <div class="round">
+                        <img id="profile-pic" class="profile-pic" src="{{ user_image }}" alt="Profile Picture" />
+                    </div>
+                
+                    <button id="logout" name="logout" onclick="window.location.href='/logout'">SAIR</button>
+                </div>
+            {% else %}
+                <button id="form-open">LOGIN</button>
+            {% endif %}
+        </nav>
+        
+    </header>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-message" id="flash-message">{{ messages[0] }}</div>
+        {% endif %}
+    {% endwith %}
+
+    
+    <section class="corpo">
+        <div class="main" >
+            <div class="content">
+                <h1>Kyube</h1>
+                <p>O Kyube tem como finalidade servir como um indexador para URLs.</p>
+            </div>
+        </div>
+
+        <div class="formulario">
+            <i class="uil uil-times form-close"></i>
+            
+            <div class="form_container_log">
+                
+                <form id="validação_log" action="/logar" method="post">
+                    <div class="cabeça">
+                        <h2> LOGIN </h2>
+                    </div>
+
+                    <label for="email">Email:</label>
+                    <div class="input_log">
+                        <i class="uil uil-envelope-alt ic"></i>
+                        <input type="email" name="email" placeholder="Digite seu email" id="email2"/>
+                        <text>...</text>
+                    </div>
+
+                    <label for="password">Password:</label>
+                    <div class="input_log">
+                        <i class="uil uil-lock ic"></i>
+                        <input type="password" name="password" placeholder="Digite sua senha" id="password3"/>
+                        <i class="uil uil-eye-slash eyes"></i>
+                    </div>
+
+                    <div class="form_cada">
+                        <a id="form_cad" href="for">CADASTRE-SE</a>
+                        <text1>Ainda não tem uma conta?</text1>
+                    </div>
+
+                    <div class="buttonsubmit">
+                        <button type="submit" value="enviar">ENTRAR</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="form_container_cad">
+
+                <form id="validação_cad" action="/cadastrar" method="post">
+                    <div class="cabeça">
+                        <h2> CADASTRE-SE </h2>
+                    </div>
+
+                    <label for="email">Email:</label>
+                    <div class="input_log">
+                        <i class="uil uil-envelope-alt ic"></i>
+                        <input type="email" name="email" placeholder="Digite seu email" id="email"/>
+                        <text>...</text>
+                    </div>
+
+                    <div class="input_log">
+                        <i class="uil uil-user ic"></i>
+                        <input type="text" name="name" placeholder="Digite um nome para conta" id="nome"/>
+                        <text>...</text>
+                    </div>
+
+                    <label for="password">Password:</label>
+                    <div class="input_log">
+                        <i class="uil uil-lock ic"></i>
+                        <input type="password" name="password" placeholder="Digite sua senha" id="password1"/>
+                        <i class="uil uil-eye-slash eyes"></i>
+                    </div>
+                    
+                    <div class="input_log">
+                        <i class="uil uil-lock ic"></i>
+                        <input type="password" name="confirm_password" placeholder="Confirme sua senha" id="password2"/>
+                        <i class="uil uil-eye-slash eyes"></i>
+                    </div>
+
+                    <div id="errorMessages"></div>
+
+                    <div class="form_cada">
+                        <a id="form_log" href="for">LOGIN</a>
+                        <text1>Já possui uma conta?</text1>
+                    </div>
+
+                    <div class="buttonsubmit">
+                        <button type="submit" value="enviar" id="clickcad">CADASTRAR</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>
