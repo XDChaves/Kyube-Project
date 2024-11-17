@@ -14,7 +14,7 @@ load_dotenv()
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# Função para verificar extensão permitida
+# Função para verificar extensão permitida, para a foto de perfil
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -48,7 +48,7 @@ def send_confirmation_email(email, token):
     confirm_url = url_for('confirm_email', token=token, _external=True)
     name = request.form.get('name')
 
-    # Calcula a hora de expiração
+    # Calcula a hora de expiração do token (pode não estar funcionando corretamente)
     expiration_time = (datetime.now(tz=timezone.utc) + timedelta(hours=1)).strftime('%H:%M UTC')
 
     msg = Message(
@@ -57,7 +57,7 @@ def send_confirmation_email(email, token):
         recipients=[email]
     )
     
-    # Corpo do e-mail em HTML
+    # Corpo da msg mandada no gmail
     msg.html = (
         f"<p>Olá, {name}! </p>"
         f"<p>Obrigado por se cadastrar no <strong>KYUBE</strong>! Para concluir seu cadastro, "
@@ -76,7 +76,7 @@ def confirm_email(token):
     if temp_user and temp_user['confirmation_token'] == token:
         # Verifica se o token está expirado
         token_expiration = datetime.fromisoformat(temp_user['token_expiration']).replace(tzinfo=timezone.utc)
-        if token_expiration >= datetime.now(tz=timezone.utc):  #Usa timezone-aware now
+        if token_expiration >= datetime.now(tz=timezone.utc):
 
             # Cria o usuário com o hashing automático no modelo User
             new_user = User(
@@ -127,11 +127,12 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:  # Verifica se o usuário não está logado
-            flash("Você precisa estar logado para acessar a página.")  # Define a mensagem
+            flash("Você precisa estar logado para acessar a página.") 
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
 
+# Função pra foto de perfil
 @login_required
 def upload_profile_image():
     if 'profile_image' not in request.files:
@@ -141,29 +142,27 @@ def upload_profile_image():
     if file and allowed_file(file.filename):
         # Obtém o nome do usuário logado da sessão
         user_name = session.get('user_name')
-        extension = 'jpg'  # Extensão padrão para o arquivo de imagem
-        filename = secure_filename(f"{user_name}.{extension}") # Salva com um nome seguro
+        extension = 'jpg'
+        filename = secure_filename(f"{user_name}.{extension}") 
 
-        # Define o caminho completo do upload
+        
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
-        # Verifica se já existe um arquivo e o substitui
+        
         if os.path.exists(filepath):
-            os.remove(filepath)  # Remove o arquivo antigo, caso exista
+            os.remove(filepath)
         file.save(filepath)
     
-        # Atualiza o banco de dados com o caminho do novo arquivo
         user_id = session.get('user_id')
         user_data = Dados.query.filter_by(user_id=user_id).first()
         
         if user_data:
-            user_data.imagens = filename  # Salva apenas o nome do arquivo
+            user_data.imagens = filename
         else:
             user_data = Dados(user_id=user_id, imagens=filename, nome_url='', url='', descricao='')
             db.session.add(user_data)
         db.session.commit()
         
-        # Retorna a URL da imagem para o frontend
         return jsonify({'success': True, 'image_url': url_for('static', filename=f'uploads/{filename}')})
     else:
         return jsonify({'error': 'Tipo de arquivo não permitido.'}), 400
@@ -174,7 +173,7 @@ def index():
 
     # Verifica se o usuário possui uma imagem de perfil salva
     user_data = Dados.query.filter_by(user_id=user_id).first()
-    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')  # Imagem padrão
+    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')
     
     if user_data and user_data.imagens:
         user_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], user_data.imagens)
@@ -190,7 +189,7 @@ def create():
 
     # Verifica se o usuário possui uma imagem de perfil salva
     user_data = Dados.query.filter_by(user_id=user_id).first()
-    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')  # Imagem padrão
+    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')
 
     if user_data and user_data.imagens:
         user_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], os.path.basename(user_data.imagens))
@@ -227,7 +226,7 @@ def perfil():
 
     # Verifica se o usuário possui uma imagem de perfil salva
     user_data = Dados.query.filter_by(user_id=user_id).first()
-    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')  #Imagem padrão
+    user_image = url_for('static', filename='uploads/padraoperfilfoto.png')
 
     if user_data and user_data.imagens:
         user_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], user_data.imagens)
@@ -252,13 +251,13 @@ def deletar_url(id):
 
 view = [
     ("/", index),
-    ("/cadastrar", cadastrar),  # Rota para cadastrar o usuário
-    ("/confirm_email/<token>", confirm_email),  # Rota para confirmação de e-mail
-    ("/verificar_email", verificar_email),  # Rota para verificação de e-mail assíncrona
-    ("/logar", login),  # Adiciona a rota de login ao view
+    ("/cadastrar", cadastrar), 
+    ("/confirm_email/<token>", confirm_email), 
+    ("/verificar_email", verificar_email), 
+    ("/logar", login), 
     ("/perfil", perfil),
     ("/create", create),
-    ("/logout", logout),  # Adiciona a rota de logout
+    ("/logout", logout),
     ("/upload_profile_image", upload_profile_image),
     ("/salvar_url", salvar_url),
     ("/deletar_url/<int:id>", deletar_url)
