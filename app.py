@@ -19,7 +19,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Configuração do servidor usando Gmail
+    # Conexão com o Gmail
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
@@ -31,7 +31,7 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
 
-    # Configuração para upload de imagem de perfil
+    # Configuração para upload da imagem de perfil
     UPLOAD_FOLDER = os.path.join('static', 'uploads')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -45,10 +45,9 @@ def create_app():
         except Exception as e:
             print(f"Erro ao criar as tabelas: {e}")
 
-    # Import views (after app creation)
     from view import view
 
-    # Register routes from view module
+    # Registra as rotas usados em view.py
     for route, view_func in view:
         app.add_url_rule(route, view_func.__name__, view_func, methods=["POST", "GET"])
         
