@@ -1,5 +1,5 @@
 import uuid
-from db_config import db  # Importa a instância `db` do banco de dados
+from db_config import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
