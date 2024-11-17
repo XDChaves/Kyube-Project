@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from db_config import db
 from flask_mail import Mail
 
-# Load environment variables
+# Carrega as variaveis do arquivo .env
 load_dotenv()
 
 mail = Mail()
@@ -13,24 +13,23 @@ mail = Mail()
 def create_app():
     app = Flask(__name__)
 
-    # Defina sua chave secreta
     app.secret_key = os.getenv('s_key')
 
-    # Database configuration
+    # Conexão com o banco de dados no arquivo .env
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Configuração do servidor de e-mail (exemplo usando Gmail)
+    # Configuração do servidor usando Gmail
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # Usuário de e-mail
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Senha ou App Password
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
-    # Inicializa o Flask-Mail e SQLAlchemy com o app
+    # Inicializa o Flask-Mail e SQLAlchemy e Migrate
     mail.init_app(app)
     db.init_app(app)
-    migrate = Migrate(app, db)  #Inicializa o Flask-Migrate com o app e o banco de dados
+    migrate = Migrate(app, db)
 
     # Configuração para upload de imagem de perfil
     UPLOAD_FOLDER = os.path.join('static', 'uploads')
